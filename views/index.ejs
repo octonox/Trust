@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Trust</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap and its dependecies -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+    <!-- Angular.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  </head>
+
+  <body>
+    <!-- The Angular.js application -->
+    <div ng-app="myApp" ng-controller="myCtrl">
+      <div class="container">
+        <!-- The title, the search bar and the submit button -->
+        <h1 class="text-center">Trust</h1>
+        <input class="form-control" ng-model="search" placeholder="Blablabla..."></input>
+        <button class="btn btn-primary" ng-click="sendFetchRequest()">Envoyer</button>
+
+        <!-- The Bootstrap alert -->
+        <div class="alert alert-primary alert-dismissible fade show" id="alertPostIt" ng-show="show">
+
+          <!-- The text that is displayed, where bail is the fetch request sent to the server -->
+          Recherche de {{ bail }} en cours...
+        </div>
+      </div>
+    </div>
+    <!-- Imports socket.io API -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- The script of the page -->
+    <script>
+    // Defines the application
+    var app = angular.module("myApp", []);
+
+    app.controller("myCtrl", function($scope, $timeout) {
+      // Called when the button is clicked
+      $scope.sendFetchRequest = function() {
+        if(search != "") {
+          // Creates the socket to communicate with the server
+          var socket = io();
+
+          // We get the value of the input
+          var search = $scope.search;
+          
+          // Emits the fetch reuest to the server
+          socket.emit("fetchRequest", search);
+
+          // Shows the alert with the correct word and erases the input value
+          $scope.bail = search;
+          $scope.search = "";
+          $scope.show = "true";
+
+          $scope.closeAlert = function() {
+            $scope.show = false;
+          }
+
+          $timeout(function() {
+            $scope.closeAlert();
+          }, 3000);
+        }
+      };
+    });
+    </script>
+  </body>
+</html>
